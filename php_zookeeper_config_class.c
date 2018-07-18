@@ -19,6 +19,7 @@
 #endif
 
 #include <php.h>
+#include <zookeeper/zookeeper.h>
 
 #include "php5to7.h"
 #include "php_zookeeper_class.h"
