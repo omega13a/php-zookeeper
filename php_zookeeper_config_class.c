@@ -265,7 +265,7 @@ zend_object* php_zk_config_new_from_zk(zend_class_entry *ce, php_zk_t *php_zk TS
     return &i_obj->zo;
 }
 
-#if ZOO_MAJOR_VERSION >= 3 && ZOO_MINOR_VERSION >= 6
+#if !(ZOO_MAJOR_VERSION >= 3 && ZOO_MINOR_VERSION >= 6)
 int zoo_reconfig(zhandle_t *zh, const char *joining, const char *leaving,
        const char *members, int64_t version, char *buffer, int* buffer_len,
        struct Stat *stat)
