@@ -83,8 +83,13 @@ static PHP_METHOD(ZookeeperConfig, get)
     }
 
     buffer = emalloc (length+1);
+#if ZOO_MAJOR_VERSION >= 3 ZOO_MINOR_VERSION >= 6
     status = zoo_wgetconfig(i_obj->php_zk->zk, (fci.size != 0) ? php_zk_watcher_marshal : NULL,
                       cb_data, buffer, &length, &stat);
+#else
+	status = zoo_wget(i_obj->php_zk->zk, ZOO_CONFIG_NODE, (fci.size != 0) ? php_zk_watcher_marshal : NULL,
+                      cb_data, buffer, &length, &stat);
+#endif
     buffer[length] = 0;
 
     if (status != ZOK) {
