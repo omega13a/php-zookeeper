@@ -265,6 +265,37 @@ zend_object* php_zk_config_new_from_zk(zend_class_entry *ce, php_zk_t *php_zk TS
     return &i_obj->zo;
 }
 
+#if ZOO_MAJOR_VERSION >= 3 && ZOO_MINOR_VERSION >= 6
+int zoo_reconfig(zhandle_t *zh, const char *joining, const char *leaving,
+       const char *members, int64_t version, char *buffer, int* buffer_len,
+       struct Stat *stat)
+{
+    struct sync_completion *sc;
+    int rc=0;
+
+    if(buffer_len==NULL)
+        return ZBADARGUMENTS;
+    if((sc=alloc_sync_completion())==NULL)
+        return ZSYSTEMERROR;
+
+    sc->u.data.buffer = buffer;
+    sc->u.data.buff_len = *buffer_len;
+    rc=zoo_areconfig(zh, joining, leaving, members, version, SYNCHRONOUS_MARKER, sc);
+
+    if(rc==ZOK){
+        wait_sync_completion(sc);
+        rc = sc->rc;
+        if (rc == 0) {
+            if(stat)
+                *stat = sc->u.data.stat;
+            *buffer_len = sc->u.data.buff_len;
+        }
+    }
+    free_sync_completion(sc);
+    return rc;
+}
+#endif
+
 static void php_zookeeper_config_reconfig_impl(INTERNAL_FUNCTION_PARAMETERS, const char *joining,
         const char *leaving, const char *members, int64_t version, zval **stat_info_pp)
 {
