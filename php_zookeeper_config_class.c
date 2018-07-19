@@ -87,6 +87,7 @@ static PHP_METHOD(ZookeeperConfig, get)
     status = zoo_wgetconfig(i_obj->php_zk->zk, (fci.size != 0) ? php_zk_watcher_marshal : NULL,
                       cb_data, buffer, &length, &stat);
 #else
+	#define ZOO_CONFIG_NODE "/zookeeper/config"
 	status = zoo_wget(i_obj->php_zk->zk, ZOO_CONFIG_NODE, (fci.size != 0) ? php_zk_watcher_marshal : NULL,
                       cb_data, buffer, &length, &stat);
 #endif
